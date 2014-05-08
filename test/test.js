@@ -52,8 +52,8 @@ describe("Node Server Request Listener Function", function() {
     });
   });
 
-  xit("Should append submitted sites to 'sites.txt'", function(done) {
-    var url = "www.example.com";
+  it("Should append submitted sites to 'sites.txt'", function(done) {
+    var url = "www.google.com";
     var req = new stubs.Request("/", "POST", {url: url});
 
     // Reset the test file and process request

@@ -1,4 +1,5 @@
 var fs  = require('fs');
+var readline = require('readline');
 
 var headers = {
   "access-control-allow-origin": "*",
@@ -13,23 +14,23 @@ exports.sendResponse = function(response, data, status) {
   response.end(data);
 };
 
-exports.loadFile = function (fileName,res){
-  console.log(fileName);
-  fs.exists(fileName, function(exists) {
-    if (exists) {
-      fs.stat(fileName, function(error, stats) {
-        fs.open(fileName, "r", function(error, fd) {
-          var buffer = new Buffer(stats.size);
-          fs.read(fd, buffer, 0, buffer.length, null, function(error, bytesRead, buffer) {
-            var data = buffer.toString("utf8", 0, buffer.length);
-            exports.sendResponse(res,data);
-            fs.close(fd);
-          });
-        });
-      });
-    }
+exports.loadFile = function (fileName,res, status){
+  fs.readFile(fileName, function(err, data) {
+    if (err) throw err;
+    exports.sendResponse(res, data.toString(), status);
   });
 };
+
+exports.collectData = function(request, callback) {
+    var data = "";
+    request.on('data', function(partial) {
+      data += partial;
+      request.on('end', function() {
+        callback(data);
+      });
+    });
+}
+
 exports.send404 = function(response) {
   exports.sendResponse(response, "not found", 404);
 };
