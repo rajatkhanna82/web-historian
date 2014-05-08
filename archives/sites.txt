@@ -6,3 +6,8 @@ www.bbc.com
 www.abc.com
 www.cnn.com
 www.xyz.com
+www.asd.com
+www.reddit.com
+www.amazon.com
+www.ebay.com
+www.apple.com
