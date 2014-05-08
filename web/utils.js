@@ -1,5 +1,3 @@
-var fs  = require('fs');
-var readline = require('readline');
 
 var headers = {
   "access-control-allow-origin": "*",
@@ -12,13 +10,6 @@ exports.sendResponse = function(response, data, status) {
   status = status || 200;
   response.writeHead(status, headers);
   response.end(data);
-};
-
-exports.loadFile = function (fileName,res, status){
-  fs.readFile(fileName, function(err, data) {
-    if (err) throw err;
-    exports.sendResponse(res, data.toString(), status);
-  });
 };
 
 exports.collectData = function(request, callback) {
