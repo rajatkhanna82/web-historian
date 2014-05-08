@@ -2,3 +2,7 @@ www.google.com
 www.test.com
 www.cats.com
 www.yahoo.com
+www.bbc.com
+www.abc.com
+www.cnn.com
+www.xyz.com

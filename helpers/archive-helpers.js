@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var utils = require('../web/utils.js')
 var _ = require('underscore');
 
 /*
@@ -24,6 +25,13 @@ exports.initialize = function(pathsObj){
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
+exports.loadFile = function (fileName,res, status){
+    console.log("loadFile  :",fileName);
+  fs.readFile(fileName, function(err, data) {
+    if (err) throw err;
+    utils.sendResponse(res, data.toString(), status);
+  });
+};
 
 exports.readListOfUrls = function(callback){
   callback = callback || _.identity;
@@ -36,33 +44,58 @@ exports.readListOfUrls = function(callback){
     });
 };
 
-exports.isUrlInList = function(url,cbPresent,cbNtPresent){
-  cbPresent = cbPresent || _.identity;
-  cbNtPresent = cbNtPresent || _.identity;
+exports.isUrlInList = function(url,res,callback){
+  callback = callback || _.identity;
+  
   exports.readListOfUrls(function(sites){
-      if(sites.indexOf(url) !== -1){
-        cbPresent();
+      if(sites.indexOf(url) === -1){
+        callback(res);
       }else{
-        cbNtPresent();
+        console.log(url +" is present in the list");
       }
     });
 };
 
-exports.addUrlToList = function(url, callback){
+exports.addUrlToList = function(url,res, callback){
   callback = callback || _.identity;
-  exports.isUrlInList(url,
-  function(){
-    console.log('url present in the List');
-  },function(){
+  console.log("addUrlToList : URL",url);
+  exports.isUrlInList(url,res,function(){
     fs.appendFile(exports.paths.list, "" + url+"\n", function(err) {
       if (err) throw err;
-      callback();
+      console.log("added to list :",url);
     });
   });
+  callback(res);
 };
 
-exports.isURLArchived = function(){
+exports.isURLArchived = function(filename, callback){
+  callback = callback || _.identity;
+  var filepath = exports.paths.archivedSites + "/"+filename;
+  fs.exists(filepath,function(exists){
+      callback(exists);
+     });
 };
 
 exports.downloadUrls = function(){
 };
+
+exports.showLoadingPage = function(res){
+  var filename = "/loading.html";
+  exports.loadAssetFiles(filename,res);
+};
+exports.loadAssetFiles = function(filename,res){
+  var filepath = exports.paths.siteAssets + filename;
+  console.log("loading... :",filepath);
+   fs.exists(filepath,function(exists){
+      if(exists){
+        exports.loadFile(filepath,res, 302);
+      }else{
+        utils.send404(res);
+      }
+     });
+
+}
+exports.showArchivedPage = function(url,res){
+  var filename = exports.paths.archivedSites +"/"+ url;
+  exports.loadFile(filename,res, 302);
+}
